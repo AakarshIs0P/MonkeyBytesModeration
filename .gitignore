@@ -1,0 +1,52 @@
+# ── Secrets ────────────────────────────────────────────────────────────────────
+.env
+
+# ── Runtime data (auto-generated, contains private guild/user IDs) ─────────────
+data/antinuke.json
+data/bj_chips.json
+data/bj_daily.json
+data/bot_logs.json
+data/buttonroles.json
+data/custom_commands.json
+data/giveaways.json
+data/log_channels.json
+data/msg_counts.json
+data/paladin.json
+data/paladin_alertnuke.json
+data/paladin_automod.json
+data/paladin_keys.json
+data/paladin_whitelist.json
+data/reminders.json
+data/sticky_messages.json
+data/tickets.json
+data/warns.json
+
+# ── Python ─────────────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# ── Virtual environments ────────────────────────────────────────────────────────
+venv/
+env/
+.venv/
+.env/
+
+# ── OS / Editor ─────────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+.idea/
+.vscode/
+*.code-workspace
+
+# ── Misc ────────────────────────────────────────────────────────────────────────
+cogs/New Text Document.txt
+*.log
