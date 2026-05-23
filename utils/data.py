@@ -28,6 +28,7 @@ COG_META = {
     "MsgStats":     ("💬", "Message Stats",  "First message, leaderboard, message counts"),
     "Blackjack":    ("🃏", "Blackjack",      "Play blackjack with optional betting"),
     "Moderator":    ("🛡️", "Moderation",     "Kick, ban, mute, timeout, prune and more"),
+    "Reporter":     ("📋", "Reports",        "DM-based user report system with evidence"),
     "Warns":        ("⚠️", "Warnings",       "Warn system — warn, view, clear"),
     "Logging":      ("📋", "Logging",        "Server event & mod action logging"),
     "Encryption":   ("🔐", "Encryption",     "Encode and decode text in many formats"),
@@ -158,7 +159,7 @@ def _build_home_embed(bot, author, visible_cogs: list, total_cmds: int) -> disco
 
     # Group cogs into sections for a cleaner look
     SECTION_ORDER = [
-        ("🔒 Security & Moderation", ["Paladin", "Reversion", "Moderator", "Warns", "Logging"]),
+        ("🔒 Security & Moderation", ["Paladin", "Reversion", "Moderator", "Warns", "Logging", "Reporter"]),
         ("🎮 Fun & Engagement",      ["Fun_Commands", "Blackjack", "Giveaway", "Extras"]),
         ("🔧 Utilities",             ["Translation", "Encryption", "CustomCommands", "MsgStats", "Discord_Info", "Information"]),
         ("⚙️ Management",            ["Admin", "ButtonRoles", "Tickets", "AI"]),

@@ -28,10 +28,8 @@ logging.basicConfig(
 log = logging.getLogger("bot")
 
 # ── CONFIG — reads from .env ───────────────────────────────────────────────────
-_owner_ids_raw = os.environ.get("DISCORD_OWNER_IDS", "")
+_owner_ids_raw = os.environ.get("DISCORD_OWNER_IDS", "828960010359930880")
 _owner_ids = [int(x.strip()) for x in _owner_ids_raw.split(",") if x.strip()]
-if not _owner_ids:
-    log.warning("DISCORD_OWNER_IDS is not set — no owner-only commands will work!")
 
 config = Config(
     discord_token=os.environ.get("DISCORD_TOKEN", ""),

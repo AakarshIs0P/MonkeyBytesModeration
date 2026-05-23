@@ -1,46 +1,51 @@
-# MonkeyBytes Moderation
+# 🐟 KoiLa — A Powerful, Modular Discord Bot
 
-A self-hostable Discord bot written in Python 3.11+ and discord.py 2.x. Includes moderation, antinuke, ticketing, AI chat (Groq and OpenRouter), an economy system, utility tools, and more — all as hot-reloadable cogs.
+KoiLa is a feature-rich, self-hostable Discord bot written in **Python 3.11+** and
+**[discord.py 2.x](https://discordpy.readthedocs.io/)**.
+It bundles moderation, antinuke, tickets, two AI backends (Groq + OpenRouter),
+blackjack with chips, message stats, button roles, encryption utilities, fun
+games, and more — all as hot-reloadable cogs.
 
-Both prefix (`!cmd`) and slash (`/cmd`) commands are supported for nearly every feature.
-
----
-
-## Features
-
-- **Paladin** — Antinuke and AutoMod: banned words, anti-invite, mass-mention detection, raid spam, role/channel wipe prevention, ban/kick flood limits
-- **Reversion** — Automatically reverses bad actor actions: re-creates wiped channels and roles, unbans victims, removes unauthorized bots and webhooks
-- **Tickets** — Dropdown ticket panel with claim/close buttons and HTML transcripts
-- **AI Chat** — Groq (free, fast) and OpenRouter (GPT-4o, Claude, Gemini, and more) backends with vision and file context support
-- **Blackjack** — 6-deck shoe, double-down, daily chips, global leaderboard
-- **Button Roles** — Persistent, restart-safe self-service role buttons
-- **Encryption** — Encode/decode base16, base32, base64, base85, ASCII85, ROT13, hex
-- **Logging** — Per-guild event and mod-action logging
-- **Message Stats** — First message lookup and per-guild leaderboard
-- **Extras** — Snipe, polls, reminders, giveaways, AFK, trivia, tic-tac-toe, and more
-- **Fun** — 8-ball, dice, slots, coinflip, roulette, and more
-- **Info & Server Tools** — ping, about, server info, user info, avatar lookup
+> Both **prefix** (`!cmd`) and **slash** (`/cmd`) commands are supported for almost
+> every feature.
 
 ---
 
-## Getting Started
+## ✨ Highlights
 
-### Requirements
+- 🛡️ **Paladin** — Antinuke + AutoMod (banned words, anti-invite, mass-mention, raid spam, role/channel wipes, ban/kick floods…)
+- ⚡ **Reversion** — Automatically *reverses* bad actions (re-creates wiped channels/roles, unbans victims, kicks rogue bots)
+- 🎟️ **Tickets** — Dropdown ticket panel with claim/close buttons + **HTML transcripts**
+- 🤖 **AI Chat** — Two backends: **Groq** (free + fast) and **OpenRouter** (GPT-4o, Claude 3.5, Gemini, …) with **vision** + **file context**
+- 🃏 **Blackjack** — 6-deck shoe, double-down, daily chips, **global leaderboard**
+- 🎭 **Button Roles** — Persistent, restart-safe self-service role buttons
+- 🔐 **Encryption** — Encode/decode base16/32/64/85, ASCII85, ROT13, hex
+- 📋 **Logging** — Per-guild event + mod-action logging
+- 💬 **Message Stats** — `firstmessage` lookup + per-guild leaderboard
+- ⭐ **Extras** — Snipe, polls, reminders, giveaways, AFK, trivia, tic-tac-toe
+- 🎮 **Fun** — 8ball, dice, slot, coinflip, roulette, hot calc, randomfact, …
+- 📊 **Information & Server tools** — `ping`, `about`, `server`, `user`, `avatar`, …
 
-- Python 3.11+
-- A Discord application and bot token — [Discord Developer Portal](https://discord.com/developers/applications)
-- *(Optional)* A Groq API key — [console.groq.com](https://console.groq.com)
-- *(Optional)* An OpenRouter API key — [openrouter.ai](https://openrouter.ai)
+---
 
-### Installation
+## 🚀 Quick Start
+
+### 1. Requirements
+
+- Python **3.11+**
+- A Discord application + bot token → <https://discord.com/developers/applications>
+- (Optional) A Groq API key → <https://console.groq.com>
+- (Optional) An OpenRouter API key → <https://openrouter.ai>
+
+### 2. Install
 
 ```bash
-git clone https://github.com/AakarshIs0P/MonkeyBytesModeration.git
-cd MonkeyBytesModeration
+git clone <your-fork-url> koila
+cd koila
 pip install -r requirements.txt
 ```
 
-### Configuration
+### 3. Configure
 
 Create a `.env` file in the project root:
 
@@ -48,256 +53,248 @@ Create a `.env` file in the project root:
 DISCORD_TOKEN=your-bot-token-here
 DISCORD_OWNER_IDS=123456789012345678,987654321098765432
 
-# Optional — only required for AI commands
+# Optional — only needed for AI cog
 GROQ_API_KEY=gsk_xxxxxxxxxxxxxxxxxxxxxxxx
 OPENROUTER_API_KEY=sk-or-v1-xxxxxxxxxxxxxxxxxxxx
 ```
 
-### Gateway Intents
+### 4. Enable required gateway intents
 
-In the Discord Developer Portal under the **Bot** tab, enable:
+In the Discord Developer Portal **Bot** tab, enable:
 
-- Presence Intent
-- Server Members Intent
-- Message Content Intent
+- ✅ Presence Intent
+- ✅ Server Members Intent
+- ✅ Message Content Intent
 
-### Running
+### 5. Run
 
 ```bash
 python index.py
 ```
 
-Expected output:
+You should see:
 
 ```
 [INFO] bot: Initialising bot...
 [INFO] bot.data: Loaded cog: cogs.msg_stats
-...
+... (other cogs)
 [INFO] bot.data: Slash commands synced: 60+ commands
-[INFO] bot: Logged in as MonkeyBytes Moderation (ID: ...)
+[INFO] bot: Logged in as KoiLa (ID: …)
 ```
 
 ---
 
-## Project Layout
+## 🗂️ Project Layout
 
 ```
-index.py        — entry point
-cogs/           — all features as hot-reloadable cogs (auto-loaded alphabetically)
-utils/          — config, data layer, helpers, permissions
-data/           — runtime JSON state (auto-created)
-.env            — secrets (not committed)
+index.py            ← single entry point
+cogs/               ← every feature is a cog (auto-loaded alphabetically)
+utils/              ← config, data layer, helpers, permissions
+data/               ← runtime JSON state (auto-created)
+.env                ← secrets (not committed)
 ```
 
-Cogs are hot-reloadable with `!reload <cog>` (owner only) — no restart needed while iterating.
+Cogs are **hot-reloadable** with `!reload <cog>` (owner only) — no bot restart
+required while you iterate.
 
 ---
 
-## Command Reference
+## 📚 Cog & Command Reference
 
-The default prefix is `!`. Every command also has a `/slash` equivalent unless noted. Commands marked 🔒 are owner-only.
+> Default prefix is `!`. Every command also has a `/slash` equivalent unless
+> noted. Owner-only commands are marked 🔒.
 
-### Fun (`cogs/fun.py`)
-
+### 🎮 Fun (`cogs/fun.py`)
 | Command | Description |
 |---|---|
 | `8ball <question>` | Magic 8-ball |
-| `duck` / `cat` / `dog` | Random animal image |
+| `duck` / `cat` / `dog` | Random animal pic |
 | `coffee` / `beer` | Send a virtual drink |
 | `coinflip` | Heads or tails |
-| `slot` | Slot machine |
+| `slot` | 🎰 Slot machine |
 | `dice [sides]` | Roll a die |
 | `roulette` | Russian roulette |
-| `rate <thing>` | Rate something 0–10 |
+| `rate <thing>` | 0–10 rating |
 | `reverse <text>` | Reverse text |
 | `password [length]` | Generate a strong password |
 | `hotcalc <a> <b>` | Compatibility calculator |
 | `randomfact` | A random fact |
 
-### Extras (`cogs/extras.py`)
-
+### ⭐ Extras (`cogs/extras.py`)
 | Command | Description |
 |---|---|
-| `snipe` | Show the last deleted message in this channel |
-| `poll <option1> \| <option2> ...` | Create a poll |
-| `remindme <duration> <message>` | Set a personal reminder |
-| `reminders` | List active reminders |
-| `tictactoe @user` | Play tic-tac-toe |
+| `snipe` | Show last deleted message in this channel |
+| `poll <question> | option1 | option2 …` | Reaction poll |
+| `remindme <duration> <message>` | Personal reminder |
+| `reminders` | List your active reminders |
+| `tictactoe @user` | Play TTT |
 | `trivia` | Random trivia question |
-| `giveaway <duration> <prize>` | Start a giveaway (requires Manage Messages) |
-| `choose <a, b, c>` | Pick one option at random |
-| `afk [reason]` | Set AFK status (clears on next message) |
+| `giveaway <duration> <prize>` | Start a giveaway (manage_messages) |
+| `choose a, b, c` | Pick one at random |
+| `afk [reason]` | Set AFK status (auto-clears on next message) |
 
-### Information (`cogs/info.py`)
-
+### 📊 Information (`cogs/info.py`)
 | Command | Description |
 |---|---|
-| `ping` | Bot and API latency |
+| `ping` | Bot + API latency |
 | `invite` | Bot invite link |
 | `about` | Bot stats |
-| `covid <country>` | COVID-19 statistics |
+| `covid <country>` | COVID-19 stats |
 
-### Server & Users (`cogs/discord_info.py`)
-
+### 🔍 Server & Users (`cogs/discord_info.py`)
 | Command | Description |
 |---|---|
-| `avatar [user]` | Show a user's avatar |
+| `avatar [user]` | Show avatar |
 | `roles` | List server roles |
 | `joinedat [user]` | When a member joined |
-| `mods` | Online staff list |
+| `mods` | Online staff |
 | `server` | Server info |
-| `user [user]` | User info |
+| `user [user]` | User info (uses tracked message count) |
 
-### Message Stats (`cogs/msg_stats.py`)
-
+### 💬 Message Stats (`cogs/msg_stats.py`)
 | Command | Description |
 |---|---|
 | `firstmessage [user]` | Find a user's first message in this server |
 | `msgleaderboard` | Top 10 chatters in this server |
 
-State is stored in `data/msg_counts.json`, flushed to disk every 2 minutes.
+State: `data/msg_counts.json` — flushed to disk every 2 minutes.
 
-### Blackjack (`cogs/blackjack.py`)
-
+### 🃏 Blackjack (`cogs/blackjack.py`)
 | Command | Description |
 |---|---|
 | `blackjack [bet]` | Play a hand (Hit / Stand / Double) |
 | `bjbalance [user]` | Check chip balance |
-| `bjdaily` | Claim 500 free chips (resets daily, UTC) |
-| `bjleaderboard` | Global chip leaderboard |
+| `bjdaily` / `blackjackdaily` | Claim 500 free chips (UTC daily) |
+| `bjleaderboard` | 🏆 **Global** chip leaderboard |
 
-State is stored in `data/bj_chips.json` and `data/bj_daily.json`. Starting balance: 1,000 chips.
+State: `data/bj_chips.json`, `data/bj_daily.json`. Default starting balance: **1000** chips.
 
-### Moderation (`cogs/mod.py`)
+### 🛡️ Moderation (`cogs/mod.py`)
+`kick`, `ban`, `unban`, `mute`, `unmute`, `timeout`, `untimeout`,
+`masskick`, `massban`, `nickname`, `purge`, `slowmode`,
+`lock`, `unlock`, `hide`, `unhide`, `find`, `announcerole`, `role`
 
-`kick`, `ban`, `unban`, `mute`, `unmute`, `timeout`, `untimeout`, `masskick`, `massban`, `nickname`, `purge`, `slowmode`, `lock`, `unlock`, `hide`, `unhide`, `find`, `announcerole`, `role`
-
-### Warnings (`cogs/warns.py`)
-
+### ⚠️ Warnings (`cogs/warns.py`)
 `warn @user <reason>`, `warnings [user]`, `clearwarn @user [index|all]`
 
-State: `data/warns.json`
+State: `data/warns.json`.
 
-### Logging (`cogs/logging_cog.py`)
-
+### 📋 Logging (`cogs/logging_cog.py`)
 | Command | Description |
 |---|---|
-| `setlog #channel` | Enable logging to a channel |
+| `setlog #channel` | Send server events to this channel |
 | `unsetlog` | Disable logging |
 
-Logs joins, leaves, message edits and deletes, role changes, channel changes, and more.
+Logs joins, leaves, message edits/deletes, role changes, channel changes, etc.
 
-### Encryption (`cogs/encryption.py`)
+### 🔐 Encryption (`cogs/encryption.py`)
+`encode <type> <text>` / `decode <type> <text>` — types: `base16`, `base32`, `base64`, `base85`, `ascii85`, `hex`, `rot13`.
 
-`encode <type> <text>` / `decode <type> <text>`
+### 🎭 Button Roles (`cogs/buttonroles.py`)
+| Command | Description |
+|---|---|
+| `buttonroles #channel <emoji1>:@role1 <emoji2>:@role2 …` | Send a persistent role-picker message |
 
-Supported types: `base16`, `base32`, `base64`, `base85`, `ascii85`, `hex`, `rot13`
+Buttons survive restarts (registered in `cog_load`).
 
-### Button Roles (`cogs/buttonroles.py`)
+### 🤖 AI Chat (`cogs/ai.py`) 🔒 (model/system changes are owner-only)
+
+**Groq backend** (free + very fast):
 
 | Command | Description |
 |---|---|
-| `buttonroles #channel <emoji>:@role ...` | Send a persistent role-picker message |
+| `ask <question>` | One-shot Q&A. Attach images / text files for context. |
+| `chat <message>` | Conversational; remembers the last N exchanges per channel. |
+| `aiclear` | Wipe this channel's Groq memory |
+| `aimodel [model]` | View / switch Groq model 🔒 |
+| `aisystem [prompt]` | View / set system prompt 🔒 |
+| `aimemory [n]` | View / set memory depth 🔒 |
+| `aistats` | Session usage |
 
-Buttons are re-registered on startup and survive restarts.
-
-### AI Chat (`cogs/ai.py`) 🔒
-
-**Groq backend** (free, fast):
-
-| Command | Description |
-|---|---|
-| `ask <question>` | One-shot Q&A. Supports image and text file attachments. |
-| `chat <message>` | Conversational; remembers the last N exchanges per channel |
-| `aiclear` | Wipe this channel's conversation memory |
-| `aimodel [model]` | View or switch the Groq model 🔒 |
-| `aisystem [prompt]` | View or set the system prompt 🔒 |
-| `aimemory [n]` | View or set memory depth 🔒 |
-| `aistats` | Session usage stats |
-
-**OpenRouter backend** (paid — GPT-4o, Claude, Gemini, and more):
+**OpenRouter backend** (paid, GPT-4o / Claude / Gemini):
 
 | Command | Description |
 |---|---|
-| `cask <question>` | One-shot Q&A via OpenRouter |
-| `cchat <message>` | Conversational via OpenRouter |
+| `cask <question>` | Same as `ask`, via OpenRouter |
+| `cchat <message>` | Same as `chat`, via OpenRouter |
 | `cclear` | Wipe OpenRouter memory |
-| `caimodel [model]` | View or switch the OpenRouter model 🔒 |
+| `caimodel [model]` | View / switch OpenRouter model 🔒 |
 | `caisystem [prompt]` | System prompt 🔒 |
 | `caimemory [n]` | Memory depth 🔒 |
-| `caistats` | Session usage stats |
+| `caistats` | Session usage |
 
-Both backends accept image attachments (PNG/JPEG/GIF/WEBP) on vision-capable models, and any plain-text file (`.py`, `.txt`, `.json`, `.md`, `.log`, etc.) up to 32 KB as additional context.
+**Attachments** — Both backends accept image attachments (PNG/JPEG/GIF/WEBP) on
+vision-capable models, and any plain-text file (`.py`, `.txt`, `.json`, `.md`,
+`.log`, …) up to 32 KB as additional context.
 
-### Paladin — Antinuke & AutoMod (`cogs/paladin.py`) 🔒 server owner only
+### 🛡️ Paladin — Antinuke + AutoMod (`cogs/paladin.py`) 🔒 server-owner only
 
-Paladin monitors actions per-actor within a sliding time window. When a threshold is crossed, it strips the actor's roles and triggers Reversion.
-
-**Antinuke:**
+**Antinuke** — limits per actor within a sliding window. When a threshold is hit, Paladin strips the actor's roles **and** triggers Reversion.
 
 ```
 paladin enable | disable
 paladin status
 paladin set <event> <count> <window_seconds>
+   events: ban, kick, channel_create, channel_delete, role_create, role_delete,
+           guild_update, bot_add, webhook
 paladin reset <event>
-paladin actions
+paladin actions   # show recent triggered actions
 ```
 
-Events: `ban`, `kick`, `channel_create`, `channel_delete`, `role_create`, `role_delete`, `guild_update`, `bot_add`, `webhook`
-
-**AutoMod:**
+**AutoMod**
 
 ```
 automod enable | disable
 automod status
 automod bannedwords add | remove | list <word>
-automod antiinvite on | off
-automod mentions <limit>
-automod spam <messages> <seconds>
+automod antiinvite on|off
+automod mentions <limit>            # 0 to disable
+automod spam <messages> <seconds>   # message-rate limit
 automod punish <warn|mute|kick|ban> <strikes_required> [timeout_minutes]
 automod warnexpire <seconds>
 ```
 
-**Whitelist & Alerts:**
+**Whitelist & Alerts**
 
 ```
-whitelist @user
-whitelistshow
-alertchannel #channel
+whitelist @user           # toggle exemption
+whitelistshow             # list current whitelist
+alertchannel #channel     # where Paladin posts incident embeds
 ```
 
-### Reversion (`cogs/reversion.py`)
+### ⚡ Reversion (`cogs/reversion.py`)
 
-No commands. Runs automatically when Paladin trips a threshold — re-creates deleted channels and roles, unbans victims, DMs kicked members an invite, restores guild settings, and removes unauthorized bots and webhooks.
+No commands — runs automatically when Paladin fires. Re-creates deleted
+channels/roles, unbans victims, DMs kicked members an invite, restores
+guild settings, and removes unauthorized bots/webhooks.
 
-### Tickets (`cogs/tickets.py`)
-
+### 🎟️ Tickets (`cogs/tickets.py`)
 | Command | Description |
 |---|---|
-| `ticket setup #panel @support [#log]` | Deploy a dropdown ticket panel |
+| `ticket setup #panel @support [#log]` | Drop a dropdown ticket panel |
 | `ticket add @user` | Add a user to the current ticket |
 | `ticket remove @user` | Remove a user from the current ticket |
-| `ticket close` | Close the ticket and generate a transcript |
+| `ticket close` | Close + transcript |
 
-Tickets include Claim and Close buttons. Transcripts are exported to the configured log channel via `chat_exporter`.
+Tickets ship with **Claim** and **Close** buttons. Transcripts are exported via
+`chat_exporter` to the configured log channel.
 
-### Admin (`cogs/admin.py`) 🔒
-
+### ⚙️ Admin (`cogs/admin.py`) 🔒
 | Command | Description |
 |---|---|
 | `load <cog>` | Load a cog |
 | `unload <cog>` | Unload a cog |
 | `reload <cog>` | Reload a cog |
-| `reloadall` | Reload all cogs |
+| `reloadall` | Reload every cog |
 | `reloadutils <name>` | Reload a `utils/*.py` module |
-| `dm <user_id> <message>` | DM a user as the bot |
+| `dm <user_id> <message>` | DM a user via the bot |
 | `announce #channel <message>` | Send an announcement |
 | `change username <name>` | Change the bot's username |
 | `change avatar <url>` | Change the bot's avatar |
 
 ---
 
-## Data & Persistence
+## 🧠 Data & Persistence
 
 All runtime state lives in plain JSON under `data/`:
 
@@ -307,52 +304,54 @@ All runtime state lives in plain JSON under `data/`:
 | `bj_daily.json` | Blackjack | `{ user_id: "YYYY-MM-DD" }` |
 | `msg_counts.json` | MsgStats | `{ guild_id: { user_id: count } }` |
 | `warns.json` | Warns | `{ guild_id: { user_id: [warns…] } }` |
-| `tickets.json` | Tickets | Per-guild config and open ticket state |
-| `buttonroles.json` | ButtonRoles | Message ↔ role mappings |
+| `tickets.json` | Tickets | `{ guild_id: {…cfg, open_tickets} }` |
+| `buttonroles.json` | ButtonRoles | persisted message ↔ role mappings |
 | `log_channels.json` | Logging | `{ guild_id: channel_id }` |
-| `paladin.json`, `paladin_automod.json`, etc. | Paladin | Per-guild config and event state |
-| `giveaways.json`, `reminders.json` | Extras | Scheduled state |
+| `paladin.json`, `paladin_automod.json`, `paladin_alertnuke.json`, `paladin_whitelist.json` | Paladin | per-guild config + state |
+| `antinuke.json`, `bot_logs.json` | Paladin | event history |
+| `giveaways.json`, `reminders.json` | Extras | scheduled state |
 
-Caches flush on a timer and on graceful shutdown. Every JSON write is atomic (`tmp` file + `os.replace`).
+Caches are flushed on a timer **and** on graceful shutdown. Every JSON write
+is atomic (`tmp` + `os.replace`).
 
 ---
 
-## Hot Reloading
+## 🔧 Hot Reload Workflow
 
-```bash
-!reload extras            # reload one cog
-!reloadall                # reload all cogs
-!reloadutils permissions  # reload a utils module
+```
+!reload extras           # reload one cog
+!reloadall               # reload all
+!reloadutils permissions # reload a utils module
 ```
 
-You can iterate on any cog without dropping the gateway connection.
+You can iterate on a single cog without dropping the gateway connection.
 
 ---
 
-## Troubleshooting
+## 🧯 Troubleshooting
 
 | Symptom | Fix |
 |---|---|
 | Slash commands don't appear | Wait up to 1 hour for global sync, or re-invite the bot with the `applications.commands` scope |
-| `LoginFailure` | Token is invalid or has been regenerated |
-| AI commands return "Network error" | Check that `GROQ_API_KEY` or `OPENROUTER_API_KEY` is set correctly in `.env` |
-| Paladin doesn't fire | Run `paladin enable`; verify the actor isn't whitelisted or a server owner |
+| `LoginFailure` | Bad / regenerated token |
+| AI commands say "Network error" | Missing/invalid `GROQ_API_KEY` or `OPENROUTER_API_KEY` |
+| Paladin doesn't fire | Run `paladin enable`; check actor isn't whitelisted/owner |
 | Tickets don't open | Run `ticket setup` first |
-| `MissingPermissions` on mod commands | Move the bot's role above the target role in the server's role list |
+| `MissingPermissions` on mod cmds | Move the bot's role above the target role |
 
 ---
 
-## Contributing
+## 🤝 Contributing
 
-PRs are welcome. A few conventions to follow:
+PRs welcome! Please:
 
-- Add new features as a cog under `cogs/`
-- Keep all I/O async-safe — use `asyncio.Lock` for shared mutable state
-- Implement `help_embed(prefix)` or fall back to docstrings for help text
-- Persist state under `data/` using atomic `tmp` + `os.replace` writes
+1. Add new features as a **cog** under `cogs/`
+2. Keep all I/O async-safe (use `asyncio.Lock` for shared state)
+3. Add a `help_embed(prefix)` method or fall back to docstrings
+4. Persist state under `data/` with atomic `tmp` + `os.replace` writes
 
 ---
 
-## License
+## 📜 License
 
-MIT — use it however you like.
+MIT — do whatever, just don't blame us.
