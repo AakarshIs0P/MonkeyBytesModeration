@@ -42,6 +42,7 @@ COG_META = {
     "CustomCommands": ("🧩", "Custom Commands", "Create, delete, and list server-made commands"),
     "Sticky":       ("📌", "Sticky Messages",  "Keep important messages refreshed in channels"),
     "Giveaway":     ("🎉", "Giveaways",       "Advanced giveaways with multi-winner & role locks"),
+    "StockTrading": ("📈", "Stock Trading",    "Trade real stocks using fake virtual CredCoins"),
     # Internal cogs — no help entry
     "Events":       None,
     "Help":         None,
@@ -160,7 +161,7 @@ def _build_home_embed(bot, author, visible_cogs: list, total_cmds: int) -> disco
     # Group cogs into sections for a cleaner look
     SECTION_ORDER = [
         ("🔒 Security & Moderation", ["Paladin", "Reversion", "Moderator", "Warns", "Logging", "Reporter"]),
-        ("🎮 Fun & Engagement",      ["Fun_Commands", "Blackjack", "Giveaway", "Extras"]),
+        ("🎮 Fun & Engagement",      ["Fun_Commands", "Blackjack", "Giveaway", "StockTrading", "Extras"]),
         ("🔧 Utilities",             ["Translation", "Encryption", "CustomCommands", "MsgStats", "Discord_Info", "Information"]),
         ("⚙️ Management",            ["Admin", "ButtonRoles", "Tickets", "AI"]),
     ]
