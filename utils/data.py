@@ -42,7 +42,7 @@ COG_META = {
     "CustomCommands": ("🧩", "Custom Commands", "Create, delete, and list server-made commands"),
     "Sticky":       ("📌", "Sticky Messages",  "Keep important messages refreshed in channels"),
     "Giveaway":     ("🎉", "Giveaways",       "Advanced giveaways with multi-winner & role locks"),
-    "StockTrading": ("📈", "Stock Trading",    "Trade real stocks using fake virtual CredCoins"),
+    "StockTrading": ("📈", "Stock Trading",    "Practice trading stocks with fake CredCoins and beginner examples"),
     # Internal cogs — no help entry
     "Events":       None,
     "Help":         None,
@@ -74,7 +74,7 @@ class CategorySelect(discord.ui.Select):
                 label=label, description=desc, emoji=emoji, value=type(cog).__name__
             ))
         super().__init__(
-            placeholder="Select a category...",
+            placeholder="Choose a command category...",
             min_values=1, max_values=1,
             options=options,
         )
@@ -88,7 +88,7 @@ class CategorySelect(discord.ui.Select):
         cog_name = self.values[0]
         cog = self.bot.cogs.get(cog_name)
         if not cog:
-            return await interaction.response.send_message("Category not found.", ephemeral=True)
+            return await interaction.response.send_message("That category could not be found.", ephemeral=True)
 
         meta = COG_META.get(cog_name)
         emoji, label, desc = meta
@@ -103,23 +103,25 @@ class CategorySelect(discord.ui.Select):
         cmds = [c for c in cog.get_commands() if not c.hidden]
         if not cmds:
             return await interaction.response.send_message(
-                "No visible commands in this category.", ephemeral=True
+                "There are no public commands in this category yet.", ephemeral=True
             )
 
         embed = discord.Embed(
             title=f"{emoji} {label}",
-            description=desc,
+            description=f"{desc}\n\nUse `{getattr(self.bot, 'prefix', '!') or '!'}help <command>` for one command.",
             colour=ACCENT_COLOUR,
         )
         for cmd in cmds:
             aliases = f" (Aliases: {', '.join(cmd.aliases)})" if cmd.aliases else ""
-            value = cmd.help or "No description provided."
+            value = cmd.help or "No description has been added yet."
             if hasattr(cmd, "commands"):
                 sub_names = ", ".join(f"`{s.name}`" for s in cmd.commands)
                 value += f"\nSubcommands: {sub_names}"
-            embed.add_field(name=f"{cmd.name}{aliases}", value=value, inline=False)
+            prefix = getattr(self.bot, "prefix", "!") or "!"
+            usage = f"`{prefix}{cmd.name}{f' {cmd.signature}' if cmd.signature else ''}`"
+            embed.add_field(name=f"{usage}{aliases}", value=value, inline=False)
         embed.set_footer(
-            text=f"{len(cmds)} command{'s' if len(cmds) != 1 else ''}"
+            text=f"{len(cmds)} command{'s' if len(cmds) != 1 else ''} in this category"
         )
         await interaction.response.edit_message(embed=embed)
 
@@ -147,10 +149,9 @@ def _build_home_embed(bot, author, visible_cogs: list, total_cmds: int) -> disco
     embed = discord.Embed(
         title=f"📖  {bot.user.name} — Command Center",
         description=(
-            f"Welcome, **{author.display_name}**! Browse **{total_cmds}** commands across "
-            f"**{len(visible_cogs)}** categories.\n"
-            f"Use the **dropdown menu** below to explore each category, "
-            f"or type `{prefix}help <command>` for details on a specific command.\n"
+            f"Welcome, **{author.display_name}**. Pick a category below to browse "
+            f"**{total_cmds}** commands across **{len(visible_cogs)}** categories.\n"
+            f"For a single command, type `{prefix}help <command>` like `{prefix}help ban`.\n"
             f"\u200b"
         ),
         colour=ACCENT_COLOUR,
@@ -189,14 +190,15 @@ def _build_home_embed(bot, author, visible_cogs: list, total_cmds: int) -> disco
     embed.add_field(
         name="💡 Quick Tips",
         value=(
-            f"`{prefix}help <command>` — Details on a command\n"
-            f"`/help` — Slash command version\n"
-            f"`{prefix}listcc` — View this server's custom commands"
+            f"`{prefix}help StockTrading` - Beginner stock trading guide\n"
+            f"`{prefix}help <command>` - Details for one command\n"
+            f"`/help` - Slash command version\n"
+            f"`{prefix}listcc` - View this server's custom commands"
         ),
         inline=False,
     )
     embed.set_footer(
-        text=f"Requested by {author} • Use the dropdown to browse categories",
+        text=f"Requested by {author} - Use the dropdown to browse categories",
         icon_url=author.display_avatar.url,
     )
     return embed
@@ -248,13 +250,13 @@ class HelpFormat(commands.HelpCommand):
         prefix = ctx.clean_prefix or ctx.prefix or "!"
         embed = discord.Embed(
             title=f"Help: {prefix}{command.qualified_name}",
-            description=command.help or "No description provided.",
+            description=command.help or "No description has been added yet.",
             colour=ACCENT_COLOUR,
         )
         usage = f"{prefix}{command.qualified_name}{f' {command.signature}' if command.signature else ''}"
         
         embed.add_field(name="Usage", value=f"`{usage}`", inline=False)
-        embed.add_field(name="Slash Command", value=f"`/{command.name}`", inline=True)
+        embed.add_field(name="Slash Command", value=f"`/{command.name}` if available", inline=True)
         
         if command.aliases:
             embed.add_field(
@@ -266,7 +268,7 @@ class HelpFormat(commands.HelpCommand):
             meta = COG_META.get(type(command.cog).__name__)
             if meta:
                 embed.add_field(name="Category", value=f"{meta[0]} {meta[1]}", inline=True)
-        embed.set_footer(text="<required>  [optional]")
+        embed.set_footer(text="<required> means you must include it. [optional] means you can leave it out.")
                 
         await ctx.send(embed=embed)
 

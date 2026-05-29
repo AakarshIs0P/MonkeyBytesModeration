@@ -12,27 +12,35 @@ import yfinance as yf
 import json
 import os
 import asyncio
+from pathlib import Path
 from datetime import datetime
 
-# ── Config ──────────────────────────────────────────────────────────────────
+# Config
 STARTING_BALANCE = 10_000.0            # Starting CredCoins per player
-DATA_FILE = "portfolios.json"          # Persistent storage
+BASE_DIR = Path(__file__).resolve().parent.parent
+DATA_DIR = BASE_DIR / "data"
+DATA_FILE = DATA_DIR / "portfolios.json"
+LEGACY_DATA_FILE = BASE_DIR / "portfolios.json"
 CACHE_EXPIRY = 60                      # How long to cache stock prices (in seconds)
 
-# ── Async Data Helpers ───────────────────────────────────────────────────────
+# Async Data Helpers
 
 def _sync_load():
-    if os.path.exists(DATA_FILE):
+    data_path = DATA_FILE if DATA_FILE.exists() else LEGACY_DATA_FILE
+    if data_path.exists():
         try:
-            with open(DATA_FILE, "r") as f:
+            with data_path.open("r", encoding="utf-8") as f:
                 return json.load(f)
-        except json.JSONDecodeError:
+        except (json.JSONDecodeError, OSError):
             return {}
     return {}
 
 def _sync_save(data: dict):
-    with open(DATA_FILE, "w") as f:
+    DATA_DIR.mkdir(parents=True, exist_ok=True)
+    temp_file = DATA_FILE.with_suffix(".json.tmp")
+    with temp_file.open("w", encoding="utf-8") as f:
         json.dump(data, f, indent=2)
+    os.replace(temp_file, DATA_FILE)
 
 async def load_data() -> dict:
     """Loads the database asynchronously without blocking the main event loop."""
@@ -70,7 +78,63 @@ class StockTrading(commands.Cog):
         """Clean up the background task when the cog is unloaded."""
         self.update_active_tickers_cache.cancel()
 
-    # ── Async Price Fetcher & Cache Engine ──────────────────────────────────
+    def help_embed(self, prefix: str = "!", guild=None) -> discord.Embed:
+        """Beginner-friendly help page for the stock trading commands."""
+        prefix = prefix or "!"
+        embed = discord.Embed(
+            title="Stock Trading - Beginner Guide",
+            description=(
+                "Practice trading real stock prices with fake CredCoins (CC). "
+                "You start with 10,000 CC, buy and sell shares, then compare net worth "
+                "on the leaderboard."
+            ),
+            color=discord.Color.gold(),
+        )
+        embed.add_field(
+            name="Start here",
+            value=(
+                f"`{prefix}stockhelp` - Open this beginner guide\n"
+                f"`{prefix}balance` - See your cash, portfolio value, and total net worth\n"
+                f"`{prefix}price AAPL` - Check a stock price before buying\n"
+                f"`{prefix}buy AAPL 2` - Buy 2 shares using your CC\n"
+                f"`{prefix}portfolio` - View the stocks you own"
+            ),
+            inline=False,
+        )
+        embed.add_field(
+            name="Trading commands",
+            value=(
+                f"`{prefix}price <ticker>` - Show the latest cached/live price\n"
+                f"`{prefix}buy <ticker> <shares>` - Buy shares, for example `{prefix}buy MSFT 1.5`\n"
+                f"`{prefix}sell <ticker> <shares>` - Sell shares you own\n"
+                f"`{prefix}leaderboard` - See the top traders by net worth\n"
+                f"`{prefix}reset` - Reset your account back to 10,000 CC"
+            ),
+            inline=False,
+        )
+        embed.add_field(
+            name="Ticker examples",
+            value=(
+                "`AAPL` Apple  |  `MSFT` Microsoft  |  `GOOGL` Alphabet\n"
+                "`AMZN` Amazon  |  `NVDA` NVIDIA  |  `TSLA` Tesla\n"
+                "`META` Meta  |  `NFLX` Netflix  |  `SPY` S&P 500 ETF"
+            ),
+            inline=False,
+        )
+        embed.add_field(
+            name="What the words mean",
+            value=(
+                "`ticker` = the short stock symbol, like AAPL or NVDA\n"
+                "`shares` = how many shares you want to buy or sell\n"
+                "`net worth` = your cash plus the current value of your stocks\n"
+                "`P&L` = profit or loss compared with the price you paid"
+            ),
+            inline=False,
+        )
+        embed.set_footer(text="Prices come from Yahoo Finance and are cached for about 60 seconds.")
+        return embed
+
+    # Async Price Fetcher & Cache Engine
 
     async def fetch_live_price(self, ticker: str) -> float | None:
         """Fetches stock price inside an executor thread to keep the bot completely fluid."""
@@ -140,30 +204,19 @@ class StockTrading(commands.Cog):
         """Wait until the bot is ready before firing up the cache loop."""
         await self.bot.wait_until_ready()
 
-    # ── Commands ──────────────────────────────────────────────────────────────
+    # Commands
 
     @commands.command(name="stockhelp")
     async def stockhelp_cmd(self, ctx):
-        """Display help documentation for trading commands."""
-        embed = discord.Embed(
-            title="📈 Stock Trading Bot — Commands",
-            color=discord.Color.gold(),
-            description="Trade real stocks with fake CredCoins (CC)!"
-        )
-        embed.add_field(name="!balance", value="Check your CC balance & net worth", inline=False)
-        embed.add_field(name="!price <TICKER>", value="Get the live price of a stock", inline=False)
-        embed.add_field(name="!buy <TICKER> <SHARES>", value="Buy shares with CC", inline=False)
-        embed.add_field(name="!sell <TICKER> <SHARES>", value="Sell shares for CC", inline=False)
-        embed.add_field(name="!portfolio", value="View your holdings", inline=False)
-        embed.add_field(name="!leaderboard", value="Top players by net worth", inline=False)
-        embed.add_field(name="!reset", value="Reset your account (fresh start)", inline=False)
-        embed.set_footer(text="Prices are real-time via Yahoo Finance. Cached every 60s.")
-        await ctx.send(embed=embed)
+        """Beginner guide for stock trading commands, examples, and ticker symbols."""
+        prefix = ctx.clean_prefix or ctx.prefix or getattr(self.bot, "prefix", "!") or "!"
+        await ctx.send(embed=self.help_embed(prefix=prefix, guild=ctx.guild))
+        return
 
     @commands.command(name="price")
     async def price_cmd(self, ctx, ticker: str = None):
         if not ticker:
-            await ctx.send("❌ Usage: `!price <TICKER>` — e.g. `!price AAPL`")
+            await ctx.send("Usage: `!price <TICKER>` - e.g. `!price AAPL`, `!price NVDA`, `!price SPY`")
             return
 
         ticker = ticker.upper()
@@ -171,11 +224,11 @@ class StockTrading(commands.Cog):
         price = await self.fetch_live_price(ticker)
         
         if price is None:
-            await ctx.send(f"❌ Could not find stock **{ticker}**. Check the ticker symbol.")
+            await ctx.send(f"Could not find stock **{ticker}**. Try examples like `AAPL`, `MSFT`, `NVDA`, or `SPY`.")
             return
 
         embed = discord.Embed(
-            title=f"📊 {ticker}",
+            title=f"{ticker} Stock Price",
             description=f"Current Price: **${price:,.2f}**",
             color=discord.Color.blue(),
             timestamp=datetime.utcnow()
@@ -199,7 +252,7 @@ class StockTrading(commands.Cog):
 
         net_worth = player["balance"] + portfolio_value
 
-        embed = discord.Embed(title=f"💰 {ctx.author.display_name}'s Account", color=discord.Color.green())
+        embed = discord.Embed(title=f"{ctx.author.display_name}'s Account", color=discord.Color.green())
         embed.add_field(name="Cash Balance", value=fmt_cc(player["balance"]), inline=True)
         embed.add_field(name="Portfolio Value", value=fmt_cc(portfolio_value), inline=True)
         embed.add_field(name="Net Worth", value=fmt_cc(net_worth), inline=True)
@@ -208,18 +261,18 @@ class StockTrading(commands.Cog):
     @commands.command(name="buy")
     async def buy_cmd(self, ctx, ticker: str = None, shares: float = None):
         if not ticker or shares is None:
-            await ctx.send("❌ Usage: `!buy <TICKER> <SHARES>` — e.g. `!buy AAPL 5`")
+            await ctx.send("Usage: `!buy <TICKER> <SHARES>` - e.g. `!buy AAPL 5` or `!buy MSFT 1.5`")
             return
 
         if shares <= 0:
-            await ctx.send("❌ Shares must be a positive number.")
+            await ctx.send("Shares must be a positive number.")
             return
 
         ticker = ticker.upper()
         await ctx.typing()
         price = await self.fetch_live_price(ticker)
         if price is None:
-            await ctx.send(f"❌ Could not find stock **{ticker}**.")
+            await ctx.send(f"Could not find stock **{ticker}**. Try examples like `AAPL`, `MSFT`, `NVDA`, or `SPY`.")
             return
 
         cost = round(price * shares, 2)
@@ -229,7 +282,7 @@ class StockTrading(commands.Cog):
             player = get_player(data, str(ctx.author.id))
 
             if player["balance"] < cost:
-                await ctx.send(f"❌ Insufficient funds! You need {fmt_cc(cost)} but only have {fmt_cc(player['balance'])}.")
+                await ctx.send(f"Insufficient funds! You need {fmt_cc(cost)} but only have {fmt_cc(player['balance'])}.")
                 return
 
             # Commit Transaction
@@ -250,7 +303,7 @@ class StockTrading(commands.Cog):
             })
             await save_data(data)
 
-        embed = discord.Embed(title="✅ Purchase Successful", color=discord.Color.green())
+        embed = discord.Embed(title="Purchase Successful", color=discord.Color.green())
         embed.add_field(name="Stock", value=ticker, inline=True)
         embed.add_field(name="Shares", value=str(shares), inline=True)
         embed.add_field(name="Price/Share", value=f"${price:,.2f}", inline=True)
@@ -261,11 +314,11 @@ class StockTrading(commands.Cog):
     @commands.command(name="sell")
     async def sell_cmd(self, ctx, ticker: str = None, shares: float = None):
         if not ticker or shares is None:
-            await ctx.send("❌ Usage: `!sell <TICKER> <SHARES>` — e.g. `!sell AAPL 2`")
+            await ctx.send("Usage: `!sell <TICKER> <SHARES>` - e.g. `!sell AAPL 2`")
             return
 
         if shares <= 0:
-            await ctx.send("❌ Shares must be a positive number.")
+            await ctx.send("Shares must be a positive number.")
             return
 
         ticker = ticker.upper()
@@ -278,18 +331,18 @@ class StockTrading(commands.Cog):
 
             if ticker not in port or port[ticker]["shares"] < shares:
                 owned = port.get(ticker, {}).get("shares", 0)
-                await ctx.send(f"❌ You only own **{owned}** shares of **{ticker}**.")
+                await ctx.send(f"You only own **{owned}** shares of **{ticker}**.")
                 return
 
             price = await self.fetch_live_price(ticker)
             if price is None:
-                await ctx.send(f"❌ Could not fetch price for **{ticker}**.")
+                await ctx.send(f"Could not fetch price for **{ticker}**.")
                 return
 
             proceeds = round(price * shares, 2)
             avg_cost = port[ticker]["avg_cost"]
             profit = round(proceeds - (avg_cost * shares), 2)
-            profit_emoji = "📈" if profit >= 0 else "📉"
+            profit_label = "Profit" if profit >= 0 else "Loss"
 
             # Commit Transaction
             port[ticker]["shares"] = round(port[ticker]["shares"] - shares, 6)
@@ -304,12 +357,12 @@ class StockTrading(commands.Cog):
             })
             await save_data(data)
 
-        embed = discord.Embed(title="✅ Sale Successful", color=discord.Color.blue())
+        embed = discord.Embed(title="Sale Successful", color=discord.Color.blue())
         embed.add_field(name="Stock", value=ticker, inline=True)
         embed.add_field(name="Shares Sold", value=str(shares), inline=True)
         embed.add_field(name="Price/Share", value=f"${price:,.2f}", inline=True)
         embed.add_field(name="Proceeds", value=fmt_cc(proceeds), inline=True)
-        embed.add_field(name=f"{profit_emoji} P&L", value=fmt_cc(profit), inline=True)
+        embed.add_field(name=profit_label, value=fmt_cc(profit), inline=True)
         embed.add_field(name="New Balance", value=fmt_cc(player["balance"]), inline=True)
         await ctx.send(embed=embed)
 
@@ -323,23 +376,23 @@ class StockTrading(commands.Cog):
 
         port = player["portfolio"]
         if not port:
-            await ctx.send("📭 Your portfolio is empty. Use `!buy <TICKER> <SHARES>` to start trading!")
+            await ctx.send("Your portfolio is empty. Use `!buy <TICKER> <SHARES>` to start trading.")
             return
 
-        embed = discord.Embed(title=f"📁 {ctx.author.display_name}'s Portfolio", color=discord.Color.purple())
+        embed = discord.Embed(title=f"{ctx.author.display_name}'s Portfolio", color=discord.Color.purple())
         total_value, total_invested = 0.0, 0.0
 
         for ticker, pos in port.items():
             price = await self.fetch_live_price(ticker)
             if price is None:
-                embed.add_field(name=ticker, value="⚠️ Price unavailable", inline=False)
+                embed.add_field(name=ticker, value="Price unavailable", inline=False)
                 continue
 
             value = price * pos["shares"]
             invested = pos["avg_cost"] * pos["shares"]
             pnl = value - invested
             pnl_pct = (pnl / invested * 100) if invested else 0
-            arrow = "▲" if pnl >= 0 else "▼"
+            direction = "up" if pnl >= 0 else "down"
 
             total_value += value
             total_invested += invested
@@ -349,14 +402,14 @@ class StockTrading(commands.Cog):
                 value=(
                     f"Shares: `{pos['shares']}`\n"
                     f"Avg Cost: `${pos['avg_cost']:,.2f}` | Now: `${price:,.2f}`\n"
-                    f"Value: `{value:,.2f} CC` | {arrow} `{pnl:+,.2f} CC ({pnl_pct:+.1f}%)`"
+                    f"Value: `{value:,.2f} CC` | {direction} `{pnl:+,.2f} CC ({pnl_pct:+.1f}%)`"
                 ),
                 inline=False
             )
 
         total_pnl = total_value - total_invested
         embed.add_field(
-            name="── Summary ──",
+            name="Summary",
             value=f"Total Value: {fmt_cc(total_value)} | P&L: {fmt_cc(total_pnl)}",
             inline=False
         )
@@ -383,8 +436,8 @@ class StockTrading(commands.Cog):
             scores.append((uid, net_worth))
 
         scores.sort(key=lambda x: x[1], reverse=True)
-        embed = discord.Embed(title="🏆 Leaderboard — Top Traders", color=discord.Color.gold())
-        medals = ["🥇", "🥈", "🥉"]
+        embed = discord.Embed(title="Leaderboard - Top Traders", color=discord.Color.gold())
+        medals = ["#1", "#2", "#3"]
 
         for i, (uid, worth) in enumerate(scores[:10]):
             try:
@@ -407,7 +460,7 @@ class StockTrading(commands.Cog):
                 "history": []
             }
             await save_data(data)
-        await ctx.send(f"🔄 **{ctx.author.display_name}** your account has been reset to {fmt_cc(STARTING_BALANCE)}. Good luck!")
+        await ctx.send(f"**{ctx.author.display_name}**, your account has been reset to {fmt_cc(STARTING_BALANCE)}. Good luck!")
 
 
 async def setup(bot: commands.Bot):

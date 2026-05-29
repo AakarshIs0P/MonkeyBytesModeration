@@ -10,3 +10,4 @@ Flask-Session>=0.5.0
 chat-exporter
 aioredis
 deep-translator
+yfinance
