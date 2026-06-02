@@ -40,7 +40,7 @@ games, and more — all as hot-reloadable cogs.
 ### 2. Install
 
 ```bash
-git clone <your-fork-url> koila
+git clone https://github.com/AakarshIs0P/MonkeyBytesModeration.git koila
 cd koila
 pip install -r requirements.txt
 ```
