@@ -47,6 +47,8 @@ COG_META = {
     "InviteTracker": ("🔗", "Invite Tracker", "Track valid invites, alts, leaves, and net totals"),
     "Essentials":   ("🧰", "Essentials", "Suggestions, rules, and server inspection tools"),
     "TTS":          ("🗣️", "Text to Speech", "Generate audio with Edge TTS voices"),
+    "ZeroTrust":    ("🔐", "Zero Trust", "Manage quota-based permissions for users"),
+    "AntiPing":     ("🔕", "Anti Ping", "Prevent specific users from being pinged"),
     # Internal cogs — no help entry
     "Events":       None,
     "Help":         None,
@@ -258,7 +260,7 @@ def _build_home_embed(bot, author, visible_cogs: list, total_cmds: int) -> disco
 
     # Group cogs into sections for a cleaner look
     SECTION_ORDER = [
-        ("🔒 Security & Moderation", ["AntiNuke", "AutoMod", "Reversion", "Moderator", "Warns", "Logging", "Reporter"]),
+        ("🔒 Security & Moderation", ["AntiNuke", "AutoMod", "Reversion", "Moderator", "Warns", "Logging", "Reporter", "AntiPing"]),
         ("🎮 Fun & Engagement",      ["Fun_Commands", "Blackjack", "Giveaway", "StockTrading", "Extras"]),
         ("🔧 Utilities",             ["Essentials", "TTS", "Translation", "Encryption", "CustomCommands", "MsgStats", "Discord_Info", "Information"]),
         ("⚙️ Management",            ["Admin", "ButtonRoles", "Tickets", "InviteTracker", "AI"]),
